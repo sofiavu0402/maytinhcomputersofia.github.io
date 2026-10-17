@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>My Pastel PC</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800;900&family=Quicksand:wght@400;500;600;700&display=swap');
+:root{--ink:#655873;--line:#eee3f4;--pink:#f5dce9;--purple:#e8e0fa;--blue:#dceefa}
+*{box-sizing:border-box}
+body,button,input,textarea,select{font-family:'Nunito','Quicksand',sans-serif;color:var(--ink)}
+body{margin:0;height:100vh;overflow:hidden}
+button{border:1px solid var(--line);background:#fffafd;border-radius:14px;padding:9px 13px;cursor:pointer;font-weight:800;transition:.18s}
+button:hover{transform:translateY(-2px);box-shadow:0 6px 16px #78668b20}
+button:disabled{opacity:.5;cursor:not-allowed}
+input,textarea,select{border:1px solid var(--line);border-radius:13px;padding:10px;background:#fffdfd;max-width:100%;outline:none}
+input:focus,textarea:focus,select:focus{border-color:#c9a9df;box-shadow:0 0 0 3px #eee4f8}
+input[type=color]{width:43px;height:36px;padding:3px}
+#wallpaper{position:fixed;inset:0;z-index:-2;background:linear-gradient(135deg,#dceefa,#e8e0fa,#f8e4ed);background-size:cover;background-position:center}
+#desktop{height:calc(100vh - 52px);padding:22px;overflow:auto}
+#top{display:flex;align-items:center;gap:12px;margin-bottom:24px}
+#avatar{width:54px;height:54px;border-radius:20px;object-fit:cover;background:#fff9;border:2px solid white;box-shadow:0 4px 15px #65587322}
+#pcname{font:800 23px 'Quicksand',sans-serif;letter-spacing:-.5px}
+#subtitle{font-size:12px;opacity:.75;margin-top:4px}
+#icons{display:grid;grid-template-columns:repeat(auto-fill,94px);gap:15px 12px;max-width:680px}
+.app{width:92px;min-height:96px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:7px;padding:8px;background:#ffffff82;border:1px solid #ffffffc7;border-radius:23px;backdrop-filter:blur(13px);cursor:pointer;transition:.2s}
+.app:hover{transform:translateY(-5px) scale(1.035);background:#ffffffed;box-shadow:0 12px 26px #74668d29}
+.emoji{font-size:31px}
+.app span:last-child{font-size:12px;font-weight:900}
+#taskbar{position:fixed;bottom:0;left:0;right:0;height:52px;display:flex;align-items:center;gap:9px;padding:5px 12px;background:#ffffffdf;backdrop-filter:blur(22px);border-top:1px solid white;z-index:5000}
+#startBtn{font-size:21px;padding:4px 12px}
+#taskApps{display:flex;gap:5px;flex:1;overflow:auto}
+.taskApp{padding:6px 10px;white-space:nowrap}
+#systemTray{font-size:12px;white-space:nowrap}
+#startMenu{display:none;position:fixed;left:10px;bottom:59px;width:275px;max-height:70vh;overflow:auto;padding:14px;background:#ffffffef;backdrop-filter:blur(20px);border:1px solid white;border-radius:23px;z-index:5001;box-shadow:0 15px 45px #665a7830}
+#startMenu button{display:block;width:100%;text-align:left;margin-top:7px}
+.window{position:fixed;left:50%;top:49%;transform:translate(-50%,-50%);width:min(720px,94vw);height:min(580px,80vh);background:#fffafdf5;backdrop-filter:blur(22px);border:1px solid white;border-radius:24px;box-shadow:0 18px 55px #76668d32;z-index:20;overflow:hidden;display:none}
+.window.wide{width:min(960px,96vw);height:min(660px,85vh)}
+.window.maximized{left:8px!important;top:8px!important;transform:none!important;width:calc(100vw - 16px)!important;height:calc(100vh - 68px)!important}
+.titlebar{height:46px;display:flex;align-items:center;gap:9px;padding:0 13px;background:linear-gradient(90deg,#f8e8f2,#eee9ff,#e6f3fc);border-bottom:1px solid #eee5f2;cursor:grab;user-select:none}
+.titlebar strong{flex:1;font-size:14px}
+.winbtn{padding:4px 10px;border-radius:10px}
+.winbody{height:calc(100% - 46px);overflow:auto;padding:15px}
+.row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.muted{font-size:12px;opacity:.75;line-height:1.6}
+.panel{background:#ffffffc9;border:1px solid #f0e7f4;border-radius:18px;padding:12px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px}
+.photo{border:1px solid #eee3f2;border-radius:17px;overflow:hidden;background:white}
+.photo img{display:block;width:100%;height:125px;object-fit:cover;cursor:zoom-in;transition:transform .2s}
+.photo img:hover{transform:scale(1.035)}
+.pinfo{padding:9px;font-size:12px;overflow-wrap:anywhere}
+.pinfo button{font-size:11px;padding:5px 7px;margin:4px 2px 0 0}
+#paintCanvas{display:block;width:100%;height:340px;background:white;border:1px solid var(--line);border-radius:16px;touch-action:none}
+#paintUpload,#galleryUpload,#wallUpload,#avatarUpload{display:none}
+#trashList{display:grid;gap:9px}
+.trashItem{display:flex;align-items:center;gap:10px;flex-wrap:wrap;background:#fff;border:1px solid var(--line);border-radius:14px;padding:10px}
+.trashItem .name{flex:1;min-width:100px}
+#chatLayout{display:grid;grid-template-columns:180px minmax(0,1fr);gap:12px;height:100%}
+#chatSide{background:#f5effb;border-radius:17px;padding:12px}
+#chatMain{display:flex;flex-direction:column;gap:10px;min-width:0}
+#chatMessages{flex:1;overflow:auto;background:white;border-radius:16px;padding:12px}
+.bubble{padding:10px 12px;border-radius:15px;margin:7px 0;max-width:90%;background:#f2eafa;overflow-wrap:anywhere}
+.bubble.me{margin-left:auto;background:#e4f2fb}
+#chatForm{display:flex;gap:8px}
+#chatInput{flex:1;min-width:0}
+.secret-line{width:100%;text-align:left;padding:14px;background:linear-gradient(110deg,#fff,#f7efff);font-weight:900}
+#secretPenguinArea{display:none;padding:12px;text-align:center}
+#secretPenguin{font-size:68px;background:transparent;border:0;box-shadow:none}
+#secretPenguin:hover{transform:scale(1.2) rotate(-5deg)}
+#jumpscare{display:none;position:fixed;inset:0;z-index:100000;background:#08050c;color:white;align-items:center;justify-content:center;text-align:center;flex-direction:column}
+#scareFace{font-size:min(48vw,340px);line-height:1;filter:drop-shadow(0 0 20px red);animation:scare .12s infinite alternate}
+#scareWords{font-size:clamp(22px,5vw,48px);font-weight:900;color:#ff334f;text-shadow:0 0 15px red}
+@keyframes scare{from{transform:scale(.9) rotate(-2deg)}to{transform:scale(1.08) rotate(2deg)}}
+#imageViewer{display:none;position:fixed;inset:0;z-index:20000;background:#171322ef;align-items:center;justify-content:center;padding:20px}
+#imageViewer.show{display:flex}
+#imageViewer img{max-width:90vw;max-height:82vh;object-fit:contain;border-radius:16px;box-shadow:0 12px 50px #0005}
+#viewerClose{position:absolute;top:18px;right:18px;background:#fff;font-size:20px}
+#viewerCaption{position:absolute;bottom:15px;left:15px;right:15px;text-align:center;color:white;font-weight:800;overflow-wrap:anywhere}
+.game-card{min-width:0;text-align:center;display:flex;flex-direction:column;align-items:center;gap:7px}
+.game-icon{font-size:43px;line-height:1.3}
+.game-name{font-weight:900;overflow-wrap:anywhere;max-width:100%}
+.game-play{margin-top:3px}
+.form-field{display:flex;flex-direction:column;gap:6px;margin:12px 0}
+.form-field label{font-weight:900;font-size:13px}
+.form-field input{width:100%}
+#gameEmoji{font-size:22px}
+#emojiPreview{font-size:35px;min-width:45px;text-align:center}
+
+/* Công cụ hình vẽ kiểu PowerPoint */
+#shapeTools{background:#f8f3fc;border:1px solid #eee3f4;border-radius:16px;padding:10px;margin:10px 0}
+#shapeTools select{min-width:165px;flex:1}
+.tool-label{font-size:12px;font-weight:900}
+.shape-hint{font-size:12px;opacity:.75;margin:7px 0 0}
+@media(max-width:560px){
+ #desktop{padding:13px}
+ #icons{grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+ .app{width:100%}
+ .window{height:78vh}
+ #chatLayout{grid-template-columns:1fr}
+ #chatSide{display:none}
+ #taskApps{max-width:40vw}
+ .taskApp{font-size:11px}
+}
+</style>
+</head>
+<body>
+<div id="wallpaper"></div>
+<div id="desktop">
+  <div id="top">
+    <img id="avatar" alt="Avatar">
+    <div><div id="pcname">My Pastel PC</div><div id="subtitle">A little world made just for you 🌿</div></div>
+  </div>
+  <div id="icons"></div>
+</div>
+<div id="startMenu"><strong>Start menu</strong><div id="startApps"></div></div>
+<div id="taskbar"><button id="startBtn" title="Start menu">🌸</button><div id="taskApps"></div><span id="systemTray"></span></div>
+<div id="windows"></div>
+<input id="galleryUpload" type="file" accept="image/*" multiple>
+<input id="paintUpload" type="file" accept="image/*">
+<input id="wallUpload" type="file" accept="image/*">
+<input id="avatarUpload" type="file" accept="image/*">
+
+<div id="imageViewer" role="dialog" aria-modal="true" aria-label="Xem ảnh phóng to">
+  <button id="viewerClose" aria-label="Đóng ảnh">✕</button>
+  <img id="viewerImage" alt="Ảnh phóng to"><div id="viewerCaption"></div>
+</div>
+<div id="jumpscare" role="dialog" aria-label="Jumpscare">
+  <div id="scareFace">😱</div><div id="scareWords">AAAAAA!!</div>
+  <button id="scareClose" style="margin-top:25px">Đóng jumpscare ✕</button>
+</div>
+
+<script>
+"use strict";
+const $=s=>document.querySelector(s);
+const SECRET_LINK="https://www.youtube.com/watch?v=dQw4w9WgXcQ";
+const SECRET_MIDDLE_LINK="https://www.youtube.com/shorts/3ywZvTdXpgw";
+const STORE="pastelPC_v5",GAMES_STORE="pastelPC_customGames_v1",MAX_GAMES=20000;
+const defaults={wallpaper:"gradient",wallColor:"#e8e0fa",wallColor2:"#f8e4ed",wallpaperImage:"",avatar:"",pcname:"My Pastel PC"};
+let settings={...defaults};
+try{settings={...defaults,...JSON.parse(localStorage.getItem(STORE)||"{}")};if(settings.pcname)settings.pcname=settings.pcname.replace(/♡/g,"").trim()}catch{}
+let gallery=[],trash=[],z=20,calcText="",clockTimer=null;
+let altZeroTimes=[],jumpTimer=null,overloadUntil=0,secretMessageText="",customGames=[];
+try{const saved=JSON.parse(localStorage.getItem(GAMES_STORE)||"[]");if(Array.isArray(saved))customGames=saved.slice(0,MAX_GAMES)}catch{}
+const apps=[
+{id:"gallery",name:"Gallery",icon:"🖼️"},{id:"paint",name:"Paint",icon:"🎨"},
+{id:"files",name:"Files",icon:"📁"},{id:"notes",name:"Notes",icon:"📝"},
+{id:"calc",name:"Calculator",icon:"🧮"},{id:"clock",name:"Clock",icon:"🕰️"},
+{id:"trash",name:"Trash",icon:"🗑️"},
+{id:"calendar",name:"Calendar",icon:"🗓️"},
+{id:"secret",name:"Secret",icon:"🤫"},{id:"settings",name:"Settings",icon:"⚙️"},{id:"chat",name:"ChatGPT",icon:"💬"}];
+const icons=$("#icons"),startApps=$("#startApps"),windows=$("#windows");
+
+function saveSettings(){try{localStorage.setItem(STORE,JSON.stringify(settings));return true}catch(e){alert("Không lưu được cài đặt. Hãy thử ảnh có dung lượng nhỏ hơn nha!");return false}}
+function dataImage(file,cb){if(!file||!file.type.startsWith("image/"))return;const r=new FileReader();r.onload=()=>cb(r.result);r.readAsDataURL(file)}
+function art(type){
+ const colors={
+ meadow:["#dce8f8","#b9d7ca","#85b7a0"],sea:["#cfe7f4","#94d2df","#5dabc0"],
+ forest:["#d9eaf2","#a7c7bf","#709d8d"],sunset:["#f0d6df","#a9b7cb","#839da9"],
+ flowers:["#dce8f8","#c2ddcf","#78ad91"],universe:["#343958","#c8b8e5","#6b719e"],
+ cat:["#e5eff8","#f7e7d9","#d6b8c8"],rainbow:["#d9eafa","#e8a9c7","#a8b8e6"]};
+ const c=colors[type]||colors.meadow;
+ const sun=type==="universe"?"<circle cx='245' cy='145' r='108' fill='#c8b8e5'/><ellipse cx='245' cy='145' rx='152' ry='39' fill='none' stroke='#f7d9ef' stroke-width='7' transform='rotate(-24 245 145)'/>":`<circle cx="375" cy="60" r="29" fill="#fff1c9"/>`;
+ const hills=type==="cat"?"<circle cx='240' cy='155' r='78' fill='#f7e7d9'/><path d='M176 105L177 49 220 91M260 91L303 49 304 108' fill='#f7e7d9' stroke='#9e8995' stroke-width='5'/><circle cx='213' cy='150' r='7' fill='#665873'/><circle cx='267' cy='150' r='7' fill='#665873'/>":`<path d="M0 200 Q95 95 180 190 T360 174 T480 190 V300 H0Z" fill="${c[1]}"/><path d="M0 245 Q130 170 250 235 T480 220 V300 H0Z" fill="${c[2]}"/>`;
+ return "data:image/svg+xml;charset=UTF-8,"+encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 300"><defs><linearGradient id="s" x2="0" y2="1"><stop stop-color="${c[0]}"/><stop offset="1" stop-color="#f8e6ee"/></linearGradient></defs><rect width="480" height="300" fill="url(#s)"/>${sun}${hills}</svg>`);
+}
+function applySettings(){
+ $("#pcname").textContent=(settings.pcname||defaults.pcname).replace(/♡/g,"").trim();
+ $("#avatar").src=settings.avatar||art("flowers");
+ $("#wallpaper").style.backgroundImage=settings.wallpaper==="image"&&settings.wallpaperImage?`url("${settings.wallpaperImage}")`:settings.wallpaper==="solid"?settings.wallColor:`linear-gradient(135deg,${settings.wallColor},${settings.wallColor2})`;
+ $("#wallpaper").style.backgroundColor=settings.wallColor;
+}
+apps.forEach(a=>{
+ const b=document.createElement("button");b.className="app";b.innerHTML=`<span class="emoji">${a.icon}</span><span>${a.name}</span>`;b.onclick=()=>openApp(a.id);icons.append(b);
+ const s=document.createElement("button");s.textContent=a.icon+"  "+a.name;s.onclick=()=>{$("#startMenu").style.display="none";openApp(a.id)};startApps.append(s);
+});
+$("#startBtn").onclick=()=>{$("#startMenu").style.display=$("#startMenu").style.display==="block"?"none":"block"};
+function shell(id,title,content,wide=false){
+ let w=$("#win-"+id);
+ if(w){w.style.display="block";w.style.zIndex=++z;addTask(id,title);return w}
+ w=document.createElement("section");w.className="window"+(wide?" wide":"");w.id="win-"+id;w.style.zIndex=++z;
+ w.innerHTML=`<div class="titlebar"><span>🌷</span><strong>${title}</strong><button class="winbtn" data-act="min">—</button><button class="winbtn" data-act="max">□</button><button class="winbtn" data-act="close">×</button></div><div class="winbody">${content}</div>`;
+ windows.append(w);
+ w.querySelector('[data-act="close"]').onclick=()=>{w.style.display="none";removeTask(id);if(id==="clock"&&clockTimer){clearInterval(clockTimer);clockTimer=null}};
+ w.querySelector('[data-act="min"]').onclick=()=>{w.style.display="none";if(id==="clock"&&clockTimer){clearInterval(clockTimer);clockTimer=null}};
+ w.querySelector('[data-act="max"]').onclick=()=>w.classList.toggle("maximized");
+ w.addEventListener("mousedown",()=>w.style.zIndex=++z);drag(w);addTask(id,title);return w;
+}
+function drag(w){
+ const bar=w.querySelector(".titlebar");let down=false,ox=0,oy=0;
+ bar.addEventListener("pointerdown",e=>{if(e.target.closest("button")||w.classList.contains("maximized"))return;down=true;const r=w.getBoundingClientRect();ox=e.clientX-r.left;oy=e.clientY-r.top;w.style.transform="none";w.style.left=r.left+"px";w.style.top=r.top+"px";bar.setPointerCapture(e.pointerId)});
+ bar.addEventListener("pointermove",e=>{if(!down)return;w.style.left=Math.max(0,Math.min(innerWidth-w.offsetWidth,e.clientX-ox))+"px";w.style.top=Math.max(0,Math.min(innerHeight-w.offsetHeight-52,e.clientY-oy))+"px"});
+ bar.addEventListener("pointerup",()=>down=false);bar.addEventListener("pointercancel",()=>down=false);
+}
+function addTask(id,title){
+ let b=$("#task-"+id);if(!b){b=document.createElement("button");b.id="task-"+id;b.className="taskApp";$("#taskApps").append(b)}
+ b.textContent=(apps.find(a=>a.id===id)?.icon||"🪟")+" "+title;
+ b.onclick=()=>{const w=$("#win-"+id);if(!w)return;w.style.display=w.style.display==="none"?"block":"none";if(w.style.display==="block")w.style.zIndex=++z};
+}
+function removeTask(id){$("#task-"+id)?.remove()}
+function openApp(id){({gallery:openGallery,paint:openPaint,files:openFiles,notes:openNotes,calc:openCalc,clock:openClock,trash:openTrash,calendar:openCalendar,secret:()=>openSecret(),settings:openSettings,chat:openChat})[id]?.()}
+
+/* Xem ảnh phóng to */
+function showImage(src,name){$("#viewerImage").src=src;$("#viewerCaption").textContent=name||"";$("#imageViewer").classList.add("show")}
+function closeImageViewer(){$("#imageViewer").classList.remove("show");$("#viewerImage").src=""}
+$("#viewerClose").onclick=closeImageViewer;
+$("#imageViewer").onclick=e=>{if(e.target.id==="imageViewer")closeImageViewer()};
+document.addEventListener("keydown",e=>{if(e.key==="Escape"){closeImageViewer();closeScare()}});
+
+/* GALLERY */
+function openGallery(){
+ const w=shell("gallery","Gallery · Nature",`<div class="row"><button id="gUpload">＋ Tải ảnh lên</button><button id="gNew">🌿 Thêm tranh</button><button id="gSearch">🔎 Tìm ảnh</button></div><p class="muted">Bấm vào ảnh để phóng to. Tranh từ Paint cũng xuất hiện ở đây.</p><div id="galleryGrid" class="grid"></div>`,true);
+ const b=w.querySelector(".winbody"),grid=b.querySelector("#galleryGrid");
+ function render(){
+  grid.innerHTML="";
+  gallery.forEach((it,i)=>{
+   const card=document.createElement("div");card.className="photo";
+   const im=document.createElement("img");im.src=it.src;im.alt=it.name;im.title="Bấm để phóng to";im.onclick=()=>showImage(it.src,it.name);
+   const info=document.createElement("div");info.className="pinfo";
+   const name=document.createElement("b");name.textContent=it.name;
+   const save=document.createElement("button");save.textContent="⬇ Lưu";save.onclick=()=>{const a=document.createElement("a");a.href=it.src;const ext=it.src.startsWith("data:image/png")?"png":it.src.startsWith("data:image/jpeg")?"jpg":"svg";a.download=it.name.replace(/[^\w\-]+/g,"-")+"."+ext;a.click()};
+   const del=document.createElement("button");del.textContent="🗑️ Xoá";del.onclick=()=>{trash.push(it);gallery.splice(i,1);render()};
+   info.append(name,document.createElement("br"),save,del);card.append(im,info);grid.append(card);
+  });
+ }
+ if(!gallery.length)[["Flower Meadow","meadow"],["Peaceful Sea","sea"],["Dreamy Forest","forest"],["Soft Sunset","sunset"],["Flower Garden","flowers"],["Pastel Universe","universe"],["Cute Cat","cat"],["Pastel Rainbow","rainbow"]].forEach(([name,type])=>gallery.push({name,src:art(type)}));
+ render();
+ b.querySelector("#gUpload").onclick=()=>$("#galleryUpload").click();
+ b.querySelector("#gNew").onclick=()=>{const types=["meadow","sea","forest","sunset","flowers","universe","cat","rainbow"];gallery.push({name:"Nature art "+(gallery.length+1),src:art(types[gallery.length%types.length])});render()};
+ b.querySelector("#gSearch").onclick=()=>window.open("https://www.google.com/search?tbm=isch&q=pastel+nature+wallpaper","_blank");
+ $("#galleryUpload").onchange=e=>{[...e.target.files].forEach(f=>dataImage(f,src=>{gallery.push({name:f.name,src});render()}));e.target.value=""};
+}
+
+/* PAINT — bút vẽ + bộ hình dạng phong phú kiểu PowerPoint */
+function openPaint(){
+ const w=shell("paint","Paint · Art studio",`
+  <div class="row">
+   <button id="pUpload">🖼️ Tải ảnh</button>
+   <label>Màu <input id="pColor" type="color" value="#c58ccf"></label>
+   <label>Nét <input id="pSize" type="range" min="1" max="30" value="5"></label>
+   <button id="pErase">🧽 Tẩy</button><button id="pDraw">✏️ Bút vẽ</button>
+   <button id="pUndo">↩ Hoàn tác</button><button id="pRedo">↪ Làm lại</button><button id="pClear">Làm mới</button><button id="pSave">⬇ Lưu PNG</button>
+   <button id="pToGallery">🖼️ Lưu vào Gallery</button>
+  </div>
+  <div id="shapeTools">
+   <div class="row">
+    <span class="tool-label">🔷 Công cụ vẽ hình:</span>
+    <select id="pShape" aria-label="Chọn hình dạng">
+     <optgroup label="Nét vẽ">
+      <option value="pen">✏️ Bút vẽ tự do</option><option value="line">╱ Đường thẳng</option><option value="arrow">➡️ Mũi tên</option><option value="doubleArrow">↔️ Mũi tên hai đầu</option>
+     </optgroup>
+     <optgroup label="Hình cơ bản">
+      <option value="rect">▭ Hình chữ nhật</option><option value="square">◻️ Hình vuông</option><option value="roundRect">▢ Hình chữ nhật bo góc</option><option value="ellipse">⬭ Hình oval</option><option value="circle">⭕ Hình tròn</option><option value="triangle">🔺 Tam giác</option><option value="rightTriangle">◢ Tam giác vuông</option><option value="diamond">🔶 Hình thoi</option>
+     </optgroup>
+     <optgroup label="Đa giác">
+      <option value="pentagon">⬠ Ngũ giác</option><option value="hexagon">⬡ Lục giác</option><option value="octagon">🛑 Bát giác</option><option value="star5">⭐ Ngôi sao 5 cánh</option><option value="star6">✳️ Ngôi sao 6 cánh</option>
+     </optgroup>
+     <optgroup label="Mũi tên & ký hiệu">
+      <option value="leftArrow">⬅️ Mũi tên trái</option><option value="rightArrow">➡️ Mũi tên phải</option><option value="upArrow">⬆️ Mũi tên lên</option><option value="downArrow">⬇️ Mũi tên xuống</option><option value="chevron">❯ Dấu chevron</option><option value="plus">➕ Dấu cộng</option><option value="cross">✚ Dấu chữ thập</option><option value="lightning">⚡ Tia sét</option>
+     </optgroup>
+     <optgroup label="Hình vui nhộn">
+      <option value="heart">💗 Trái tim</option><option value="speech">💬 Bong bóng thoại</option><option value="cloud">☁️ Đám mây</option><option value="cylinder">🛢️ Hình trụ</option><option value="parallelogram">▱ Hình bình hành</option><option value="trapezoid">⏢ Hình thang</option><option value="homePlate">⬟ Ngũ giác mũi nhọn</option><option value="arc">◜ Cung tròn</option>
+     </optgroup>
+    </select>
+    <label class="row"><input type="checkbox" id="pFill" style="width:auto"> Tô màu bên trong</label>
+   </div>
+   <p class="shape-hint">Chọn hình rồi kéo chuột trên giấy để tạo hình. Có thể bật “Tô màu bên trong” để tô các hình khép kín.</p>
+  </div>
+  <div id="palette" class="row" style="margin:10px 0"></div>
+  <canvas id="paintCanvas" width="1200" height="680"></canvas>
+  <p class="muted">Vẽ trực tiếp, tạo hình, hoặc tải ảnh lên trước nhé. Lỡ vẽ sai thì bấm ↩ Hoàn tác; bấm ↪ Làm lại nếu đổi ý. Có thể hoàn tác tối đa 40 bước gần nhất.</p><p id="paintStatus" class="muted"></p>`,true);
+ const b=w.querySelector(".winbody"),c=b.querySelector("#paintCanvas"),ctx=c.getContext("2d");
+ let color="#c58ccf",size=5,erase=false,down=false,px=0,py=0,startX=0,startY=0,snapshot=null;
+ const undoStack=[],redoStack=[];
+ function saveHistory(){try{undoStack.push(ctx.getImageData(0,0,c.width,c.height));if(undoStack.length>40)undoStack.shift();redoStack.length=0}catch{}}
+ function restoreHistory(stack,other){if(!stack.length)return;other.push(ctx.getImageData(0,0,c.width,c.height));ctx.putImageData(stack.pop(),0,0)}
+ ctx.fillStyle="#fff";ctx.fillRect(0,0,c.width,c.height);
+ const colors=["#eaaacb","#c58ccf","#a7b8eb","#9ac7d5","#9bc9aa","#f0d28d","#f2a994","#776a94","#44445e","#ffffff","#f5e8f0","#000000"];
+ b.querySelector("#palette").innerHTML=colors.map(col=>`<button title="${col}" data-color="${col}" style="background:${col};width:29px;height:29px;padding:0;border-radius:50%;border:2px solid white"></button>`).join("");
+ b.querySelectorAll("[data-color]").forEach(x=>x.onclick=()=>{color=x.dataset.color;b.querySelector("#pColor").value=color;erase=false;b.querySelector("#pShape").value="pen"});
+ b.querySelector("#pColor").oninput=e=>{color=e.target.value;erase=false};
+ b.querySelector("#pSize").oninput=e=>size=+e.target.value;
+ b.querySelector("#pErase").onclick=()=>{erase=true;b.querySelector("#pShape").value="pen";b.querySelector("#paintStatus").textContent="Đang dùng tẩy."};
+ b.querySelector("#pDraw").onclick=()=>{erase=false;b.querySelector("#pShape").value="pen";b.querySelector("#paintStatus").textContent="Đang dùng bút vẽ."};
+ b.querySelector("#pUndo").onclick=()=>restoreHistory(undoStack,redoStack);
+ b.querySelector("#pRedo").onclick=()=>restoreHistory(redoStack,undoStack);
+ b.querySelector("#pClear").onclick=()=>{saveHistory();ctx.fillStyle="#fff";ctx.fillRect(0,0,c.width,c.height);b.querySelector("#paintStatus").textContent="Đã làm mới giấy vẽ."};
+ b.querySelector("#pUpload").onclick=()=>$("#paintUpload").click();
+ $("#paintUpload").onchange=e=>{dataImage(e.target.files[0],src=>{saveHistory();const im=new Image();im.onload=()=>{ctx.fillStyle="#fff";ctx.fillRect(0,0,c.width,c.height);const s=Math.min(c.width/im.width,c.height/im.height);ctx.drawImage(im,(c.width-im.width*s)/2,(c.height-im.height*s)/2,im.width*s,im.height*s)};im.src=src});e.target.value=""};
+ function pos(e){const r=c.getBoundingClientRect();return{x:(e.clientX-r.left)*c.width/r.width,y:(e.clientY-r.top)*c.height/r.height}}
+ function polygon(points){ctx.beginPath();points.forEach((p,i)=>i?ctx.lineTo(p[0],p[1]):ctx.moveTo(p[0],p[1]));ctx.closePath()}
+ function regularPolygon(cx,cy,rx,ry,n,rotation=-Math.PI/2){const pts=[];for(let i=0;i<n;i++){const a=rotation+i*Math.PI*2/n;pts.push([cx+Math.cos(a)*rx,cy+Math.sin(a)*ry])}polygon(pts)}
+ function star(cx,cy,rx,ry,points){const pts=[];for(let i=0;i<points*2;i++){const a=-Math.PI/2+i*Math.PI/points,r=i%2?0.43:1;pts.push([cx+Math.cos(a)*rx*r,cy+Math.sin(a)*ry*r])}polygon(pts)}
+ function arrowPath(x1,y1,x2,y2,both=false){const a=Math.atan2(y2-y1,x2-x1),head=Math.max(18,size*4),wing=.48;ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.moveTo(x2,y2);ctx.lineTo(x2-head*Math.cos(a-wing),y2-head*Math.sin(a-wing));ctx.moveTo(x2,y2);ctx.lineTo(x2-head*Math.cos(a+wing),y2-head*Math.sin(a+wing));if(both){ctx.moveTo(x1,y1);ctx.lineTo(x1+head*Math.cos(a-wing),y1+head*Math.sin(a-wing));ctx.moveTo(x1,y1);ctx.lineTo(x1+head*Math.cos(a+wing),y1+head*Math.sin(a+wing))}}
+ function shapePath(type,x1,y1,x2,y2){
+  const l=Math.min(x1,x2),t=Math.min(y1,y2),w=Math.max(1,Math.abs(x2-x1)),h=Math.max(1,Math.abs(y2-y1)),r=Math.min(w,h)*.16,cx=(x1+x2)/2,cy=(y1+y2)/2;
+  ctx.beginPath();
+  if(type==="line"){ctx.moveTo(x1,y1);ctx.lineTo(x2,y2)}
+  else if(type==="arrow")arrowPath(x1,y1,x2,y2);
+  else if(type==="doubleArrow")arrowPath(x1,y1,x2,y2,true);
+  else if(type==="leftArrow"||type==="rightArrow"||type==="upArrow"||type==="downArrow"){
+   let ax=x1,ay=y1,bx=x2,by=y2;if(type==="leftArrow"){ax=x2;ay=y1;bx=x1;by=y2}if(type==="upArrow"){ax=y1;ay=x1;bx=y2;by=x2}
+   const L=Math.min(x1,x2),T=Math.min(y1,y2),W=w,H=h;
+   if(type==="leftArrow")polygon([[L,T+H*.3],[L+W*.55,T+H*.3],[L+W*.55,T],[L+W,T+H*.5],[L+W*.55,T+H],[L+W*.55,T+H*.7],[L,T+H*.7]]);
+   else if(type==="rightArrow")polygon([[L,T+H*.3],[L+W*.55,T+H*.3],[L+W*.55,T],[L+W,T+H*.5],[L+W*.55,T+H],[L+W*.55,T+H*.7],[L,T+H*.7]]);
+   else if(type==="upArrow")polygon([[L+W*.3,T+H],[L+W*.3,T+H*.45],[L,T+H*.45],[L+W*.5,T],[L+W,T+H*.45],[L+W*.7,T+H*.45],[L+W*.7,T+H]]);
+   else polygon([[L+W*.3,T],[L+W*.7,T],[L+W*.7,T+H*.55],[L+W,T+H*.55],[L+W*.5,T+H],[L,T+H*.55],[L+W*.3,T+H*.55]]);
+  }
+  else if(type==="rect")ctx.rect(l,t,w,h);
+  else if(type==="square"){const s=Math.max(w,h),sx=x2<x1?x1-s:x1,sy=y2<y1?y1-s:y1;ctx.rect(sx,sy,s,s)}
+  else if(type==="roundRect"){const rr=Math.min(28,w/4,h/4);ctx.roundRect(l,t,w,h,rr)}
+  else if(type==="ellipse"||type==="circle"){const rad=type==="circle"?Math.max(w,h)/2:0;ctx.ellipse(cx,cy,type==="circle"?rad:w/2,type==="circle"?rad:h/2,0,0,Math.PI*2)}
+  else if(type==="triangle")polygon([[cx,t],[l+w,t+h],[l,t+h]]);
+  else if(type==="rightTriangle")polygon([[l,t],[l,t+h],[l+w,t+h]]);
+  else if(type==="diamond")polygon([[cx,t],[l+w,cy],[cx,t+h],[l,cy]]);
+  else if(type==="pentagon")regularPolygon(cx,cy,w/2,h/2,5);
+  else if(type==="hexagon")regularPolygon(cx,cy,w/2,h/2,6,0);
+  else if(type==="octagon")regularPolygon(cx,cy,w/2,h/2,8,Math.PI/8);
+  else if(type==="star5")star(cx,cy,w/2,h/2,5);
+  else if(type==="star6")star(cx,cy,w/2,h/2,6);
+  else if(type==="heart"){ctx.moveTo(cx,t+h*.28);ctx.bezierCurveTo(cx-w*.55,t-h*.12,l-w*.08,t+h*.42,cx,t+h);ctx.bezierCurveTo(l+w*.08,t+h*.42,cx+w*.55,t-h*.12,cx,t+h*.28)}
+  else if(type==="speech"){ctx.moveTo(l+r,t);ctx.lineTo(l+w-r,t);ctx.quadraticCurveTo(l+w,t,l+w,t+r);ctx.lineTo(l+w,t+h-r);ctx.quadraticCurveTo(l+w,t+h,l+w-r,t+h);ctx.lineTo(l+w*.36,t+h);ctx.lineTo(l+w*.25,t+h+Math.min(25,h*.2));ctx.lineTo(l+w*.27,t+h);ctx.lineTo(l+r,t+h);ctx.quadraticCurveTo(l,t+h,l,t+h-r);ctx.lineTo(l,t+r);ctx.quadraticCurveTo(l,t,l+r,t);ctx.closePath()}
+  else if(type==="cloud"){ctx.moveTo(l+w*.18,cy+h*.22);ctx.bezierCurveTo(l-w*.04,cy+h*.02,l+w*.06,t+h*.38,l+w*.28,t+h*.36);ctx.bezierCurveTo(l+w*.32,t-h*.05,l+w*.62,t-h*.02,l+w*.66,t+h*.3);ctx.bezierCurveTo(l+w*1.05,t+h*.18,l+w*1.08,t+h*.72,l+w*.78,t+h*.75);ctx.lineTo(l+w*.22,t+h*.75);ctx.bezierCurveTo(l-w*.08,t+h*.75,l-w*.05,cy+h*.3,l+w*.18,cy+h*.22);ctx.closePath()}
+  else if(type==="cylinder"){ctx.ellipse(cx,t+h*.15,w/2,Math.max(5,h*.15),0,0,Math.PI*2);ctx.moveTo(l,t+h*.15);ctx.lineTo(l,t+h*.85);ctx.ellipse(cx,t+h*.85,w/2,Math.max(5,h*.15),0,0,Math.PI);ctx.moveTo(l+w,t+h*.15);ctx.lineTo(l+w,t+h*.85)}
+  else if(type==="parallelogram")polygon([[l+w*.22,t],[l+w,t],[l+w*.78,t+h],[l,t+h]]);
+  else if(type==="trapezoid")polygon([[l+w*.22,t],[l+w*.78,t],[l+w,t+h],[l,t+h]]);
+  else if(type==="homePlate")polygon([[l,t],[l+w*.68,t],[l+w,t+h*.5],[l+w*.68,t+h],[l,t+h]]);
+  else if(type==="chevron")polygon([[l,t],[l+w*.58,t],[l+w,t+h*.5],[l+w*.58,t+h],[l,t+h],[l+w*.42,t+h*.5]]);
+  else if(type==="plus")polygon([[cx-w*.16,t],[cx+w*.16,t],[cx+w*.16,cy-h*.16],[l+w,cy-h*.16],[l+w,cy+h*.16],[cx+w*.16,cy+h*.16],[cx+w*.16,t+h],[cx-w*.16,t+h],[cx-w*.16,cy+h*.16],[l,cy+h*.16],[l,cy-h*.16],[cx-w*.16,cy-h*.16]]);
+  else if(type==="cross")polygon([[l+w*.36,t],[l+w*.64,t],[l+w*.64,t+h*.36],[l+w,t+h*.36],[l+w,t+h*.64],[l+w*.64,t+h*.64],[l+w*.64,t+h],[l+w*.36,t+h],[l+w*.36,t+h*.64],[l,t+h*.64],[l,t+h*.36],[l+w*.36,t+h*.36]]);
+  else if(type==="lightning")polygon([[l+w*.58,t],[l+w*.18,t+h*.55],[l+w*.44,t+h*.55],[l+w*.34,t+h],[l+w*.82,t+h*.38],[l+w*.56,t+h*.38]]);
+  else if(type==="arc"){ctx.ellipse(cx,cy,w/2,h/2,0,Math.PI,Math.PI*2)}
+ }
+ function drawShape(type,x1,y1,x2,y2){
+  ctx.save();ctx.strokeStyle=erase?"#fff":color;ctx.fillStyle=erase?"#fff":color;ctx.lineWidth=size*2;ctx.lineCap="round";ctx.lineJoin="round";
+  shapePath(type,x1,y1,x2,y2);
+  const open=["line","arrow","doubleArrow","leftArrow","rightArrow","upArrow","downArrow","arc"];
+  if(b.querySelector("#pFill").checked&&!open.includes(type)){ctx.globalAlpha=.32;ctx.fill();ctx.globalAlpha=1}
+  ctx.stroke();ctx.restore();
+ }
+ c.onpointerdown=e=>{saveHistory();down=true;const p=pos(e);px=startX=p.x;py=startY=p.y;snapshot=ctx.getImageData(0,0,c.width,c.height);c.setPointerCapture(e.pointerId)};
+ c.onpointermove=e=>{if(!down)return;const p=pos(e),shape=b.querySelector("#pShape").value;if(shape==="pen"){ctx.beginPath();ctx.moveTo(px,py);ctx.lineTo(p.x,p.y);ctx.lineWidth=size*2;ctx.lineCap="round";ctx.lineJoin="round";ctx.strokeStyle=erase?"#fff":color;ctx.stroke();px=p.x;py=p.y}else{ctx.putImageData(snapshot,0,0);drawShape(shape,startX,startY,p.x,p.y)}};
+ function finishShape(e){if(!down)return;const p=pos(e),shape=b.querySelector("#pShape").value;if(shape!=="pen"){ctx.putImageData(snapshot,0,0);drawShape(shape,startX,startY,p.x,p.y)}down=false;snapshot=null}
+ c.onpointerup=finishShape;c.onpointercancel=finishShape;
+ b.querySelector("#pSave").onclick=()=>{const a=document.createElement("a");a.download="my-paint.png";a.href=c.toDataURL("image/png");a.click()};
+ b.querySelector("#pToGallery").onclick=()=>{const src=c.toDataURL("image/png");gallery.push({name:"My Paint "+(gallery.filter(x=>x.name.startsWith("My Paint")).length+1),src});b.querySelector("#paintStatus").textContent="Đã thêm tranh vào Gallery! Mở Gallery để xem nha."};
+}
+
+/* FILES */
+function saveCustomGames(){try{localStorage.setItem(GAMES_STORE,JSON.stringify(customGames));return true}catch(e){alert("Trình duyệt hết dung lượng lưu game. Hãy thử xoá bớt game hoặc dữ liệu khác.");return false}}
+function safeGameUrl(value){try{const u=new URL(value);return["https:","http:"].includes(u.protocol)?u.href:null}catch{return null}}
+function openFiles(){
+ const w=shell("files","Files · Entertainment",`
+ <div class="row" style="justify-content:space-between"><div><h3 style="margin:0">🎮 Góc giải trí</h3><p class="muted">Thêm game của bạn và mở game bằng nút Chơi.</p></div><button id="addGameBtn">＋ Thêm game</button></div>
+ <div class="panel" id="gameForm" style="display:none;margin:12px 0"><h3 style="margin-top:0">✨ Thêm trò chơi mới</h3>
+ <div class="form-field"><label for="gameEmoji">Chọn emoji — tự nhập emoji bạn thích</label><div class="row"><input id="gameEmoji" placeholder="Ví dụ: 🍎 🐱 🚀 🎮" maxlength="32" autocomplete="off" style="flex:1;min-width:0"><span id="emojiPreview">🎮</span></div><span class="muted">Bạn có thể nhập bất kỳ emoji nào từ bàn phím hoặc sao chép emoji rồi dán vào đây.</span></div>
+ <div class="form-field"><label for="gameLink">Link trò chơi</label><input id="gameLink" type="url" placeholder="https://example.com/game" autocomplete="url"></div>
+ <div class="form-field"><label for="gameName">Đặt tên cho game</label><input id="gameName" maxlength="100" placeholder="Tên game của bạn"></div>
+ <p class="muted">Đã thêm <span id="gameCountForm">0</span> / 20.000 game</p><div class="row"><button id="saveGameBtn">＋ Thêm trò chơi</button><button id="cancelGameBtn">Huỷ</button></div><p id="gameFormStatus" class="muted"></p></div>
+ <div class="grid" id="gameGrid"></div><p class="muted" id="gamesCount"></p>`,true);
+ const b=w.querySelector(".winbody"),form=b.querySelector("#gameForm"),grid=b.querySelector("#gameGrid");
+ const builtIn=[
+ {name:"Skytrip",icon:"☁️",url:"https://vi.y8.com/games/skytrip"},
+ {name:"Dino Sword",icon:"🦖",url:"https://dinoswords.gg/"},
+ {name:"Geometry Dash",icon:"🔷",url:"https://geodash.org/vi/"}];
+ function renderGames(){
+  grid.innerHTML="";[...builtIn,...customGames].forEach((game,index)=>{
+   const card=document.createElement("div");card.className="panel game-card";
+   const emoji=document.createElement("div");emoji.className="game-icon";emoji.textContent=game.icon||"🎮";
+   const name=document.createElement("div");name.className="game-name";name.textContent=game.name||"Game";
+   const play=document.createElement("button");play.className="game-play";play.textContent="Chơi ↗";play.onclick=()=>window.open(game.url,"_blank","noopener,noreferrer");
+   card.append(emoji,name,play);
+   if(index>=builtIn.length){const del=document.createElement("button");del.textContent="🗑️ Xoá game";del.onclick=()=>{const i=index-builtIn.length;if(!confirm("Bạn muốn xoá game “"+game.name+"” chứ?"))return;customGames.splice(i,1);saveCustomGames();renderGames()};card.append(del)}
+   grid.append(card);
+  });
+  b.querySelector("#gamesCount").textContent=`Game có sẵn: ${builtIn.length} · Game bạn thêm: ${customGames.length.toLocaleString("vi-VN")} / ${MAX_GAMES.toLocaleString("vi-VN")}`;
+  b.querySelector("#gameCountForm").textContent=customGames.length.toLocaleString("vi-VN");
+  b.querySelector("#addGameBtn").disabled=customGames.length>=MAX_GAMES;
+  b.querySelector("#addGameBtn").textContent=customGames.length>=MAX_GAMES?"Đã đạt giới hạn":"＋ Thêm game";
+ }
+ const emojiInput=b.querySelector("#gameEmoji");
+ emojiInput.oninput=()=>b.querySelector("#emojiPreview").textContent=emojiInput.value.trim()||"🎮";
+ b.querySelector("#addGameBtn").onclick=()=>{if(customGames.length>=MAX_GAMES){alert("Bạn đã đạt giới hạn 20.000 game rồi!");return}form.style.display=form.style.display==="none"?"block":"none";b.querySelector("#gameFormStatus").textContent=""};
+ b.querySelector("#cancelGameBtn").onclick=()=>form.style.display="none";
+ b.querySelector("#saveGameBtn").onclick=()=>{
+  if(customGames.length>=MAX_GAMES){alert("Bạn đã đạt giới hạn 20.000 game rồi!");return}
+  const icon=emojiInput.value.trim(),rawUrl=b.querySelector("#gameLink").value.trim(),name=b.querySelector("#gameName").value.trim(),url=safeGameUrl(rawUrl),status=b.querySelector("#gameFormStatus");
+  if(!icon){status.textContent="Bạn hãy tự nhập emoji bạn muốn nha.";emojiInput.focus();return}
+  if(!rawUrl){status.textContent="Bạn hãy nhập link trò chơi.";b.querySelector("#gameLink").focus();return}
+  if(!url){status.textContent="Link chưa hợp lệ. Hãy nhập link bắt đầu bằng http:// hoặc https://";b.querySelector("#gameLink").focus();return}
+  if(!name){status.textContent="Bạn hãy đặt tên cho game nhé.";b.querySelector("#gameName").focus();return}
+  customGames.push({icon,url,name});if(!saveCustomGames()){customGames.pop();return}
+  emojiInput.value="";b.querySelector("#emojiPreview").textContent="🎮";b.querySelector("#gameLink").value="";b.querySelector("#gameName").value="";
+  status.textContent="Đã thêm game thành công!";renderGames();
+ };
+ renderGames();
+}
+
+/* NOTES */
+function openNotes(){
+ const w=shell("notes","Notes · Little thoughts",`<textarea id="noteText" placeholder="Viết vài điều bạn muốn ghi nhớ..." style="width:100%;height:72%;min-height:180px"></textarea><div class="row" style="margin-top:10px"><button id="noteSave">💾 Lưu</button><button id="noteClear">Xoá nội dung</button><span id="noteStatus" class="muted"></span></div>`);
+ const b=w.querySelector(".winbody"),ta=b.querySelector("#noteText");try{ta.value=localStorage.getItem("pastelPC_notes")||""}catch{}
+ b.querySelector("#noteSave").onclick=()=>{try{localStorage.setItem("pastelPC_notes",ta.value);b.querySelector("#noteStatus").textContent="Đã lưu"}catch{b.querySelector("#noteStatus").textContent="Không thể lưu"}};
+ b.querySelector("#noteClear").onclick=()=>{ta.value="";try{localStorage.removeItem("pastelPC_notes")}catch{}};
+}
+
+/* CALCULATOR */
+function openCalc(){
+ const w=shell("calc","Calculator",`<div class="panel"><div id="calcScreen" style="font-size:27px;font-weight:bold;overflow-wrap:anywhere">0</div></div><div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:12px">${["C","⌫","%","÷","7","8","9","×","4","5","6","−","1","2","3","+","±","0",".","="].map(k=>`<button style="font-size:18px;padding:13px 5px" data-k="${k}">${k}</button>`).join("")}</div>`);
+ const b=w.querySelector(".winbody"),screen=b.querySelector("#calcScreen");
+ b.querySelectorAll("[data-k]").forEach(btn=>btn.onclick=()=>{
+  const k=btn.dataset.k;
+  if(k==="C")calcText="";else if(k==="⌫")calcText=calcText.slice(0,-1);else if(k==="±"){if(calcText)calcText=String(-Number(calcText))}
+  else if(k==="="){try{const exp=calcText.replace(/×/g,"*").replace(/÷/g,"/").replace(/−/g,"-").replace(/%/g,"/100");if(!/^[\d+\-*/().\s]+$/.test(exp))throw 0;const n=Function('"use strict";return ('+exp+')')();calcText=Number.isFinite(n)?String(+n.toFixed(8)):"Error"}catch{calcText="Error"}}
+  else calcText+=k;screen.textContent=calcText||"0";
+ });
+}
+
+/* CLOCK — timer with selectable instrumental alarm sounds */
+let activeTimer=null, alarmContext=null, alarmNodes=[];
+function stopAlarm(){alarmNodes.forEach(n=>{try{n.stop()}catch{}});alarmNodes=[];if(alarmContext){try{alarmContext.close()}catch{}alarmContext=null}}
+function playAlarm(style){stopAlarm();const AC=window.AudioContext||window.webkitAudioContext;if(!AC)return;alarmContext=new AC();const ctx=alarmContext;
+ const patterns={chill:[523.25,659.25,783.99,659.25],happy:[659.25,783.99,987.77,783.99],power:[440,660,880,660],rain:[392,440,523.25,440],piano:[523.25,659.25,783.99,1046.5],bell:[880,659.25,880,1046.5],marimba:[523.25,783.99,659.25,987.77],soft:[392,523.25,659.25,523.25],retro:[440,880,660,990]};const notes=patterns[style]||patterns.chill;
+ // Phát giai điệu lặp khoảng 25 giây thay vì chỉ kêu hơn 1 giây.
+ const noteGap=.9, noteLength=.78, repeats=7, start=ctx.currentTime+.05;
+ for(let r=0;r<repeats;r++) notes.forEach((freq,i)=>{const osc=ctx.createOscillator(),gain=ctx.createGain(),at=start+(r*notes.length+i)*noteGap;osc.type=(style==='power'||style==='retro'||style==='marimba')?'triangle':'sine';osc.frequency.value=freq;gain.gain.setValueAtTime(.0001,at);gain.gain.exponentialRampToValueAtTime(.14,at+.08);gain.gain.setValueAtTime(.14,at+noteLength*.55);gain.gain.exponentialRampToValueAtTime(.0001,at+noteLength);osc.connect(gain);gain.connect(ctx.destination);osc.start(at);osc.stop(at+noteLength+.02);alarmNodes.push(osc)});
+}
+function openClock(){
+ const w=shell("clock","Clock · Take a break",`<div style="text-align:center;padding:20px 5px"><div style="font-size:45px">🌙</div><div id="bigClock" style="font-size:42px;font-weight:bold"></div><div id="bigDate"></div><hr><h3>⏳ Đồng hồ đếm ngược</h3><div class="row" style="justify-content:center"><input id="timerMin" type="number" min="1" max="1440" value="5" style="width:75px"><span>phút</span></div><p style="margin-bottom:5px">🎵 Chọn tiếng báo hết giờ (nhạc không lời)</p><select id="alarmStyle" style="max-width:100%;width:260px"><option value="chill">🌙 Chill nhẹ nhàng</option><option value="happy">🌸 Tươi vui, dễ thương</option><option value="power">⚡ Mạnh mẽ, dứt khoát</option><option value="rain">🌧️ Êm dịu như mưa</option><option value="piano">🎹 Piano trong trẻo</option><option value="bell">🔔 Chuông ngân</option><option value="marimba">🪇 Marimba vui tai</option><option value="soft">🫧 Êm dịu</option><option value="retro">🕹️ Âm báo retro</option></select><div class="row" style="justify-content:center;margin-top:12px"><button type="button" data-preset="1">1 phút</button><button type="button" data-preset="5">5 phút</button><button type="button" data-preset="10">10 phút</button><button type="button" data-preset="25">25 phút</button></div><div class="row" style="justify-content:center;margin-top:12px"><button id="timerStart">▶ Bắt đầu</button><button id="timerStop">■ Dừng</button><button id="alarmTest">♪ Thử tiếng</button></div><p id="timerStatus" class="muted">Chọn thời gian và âm báo, rồi bắt đầu nha.</p></div>`);
+ const b=w.querySelector(".winbody");b.querySelectorAll("[data-preset]").forEach(btn=>btn.onclick=()=>{b.querySelector("#timerMin").value=btn.dataset.preset});function tick(){if(w.style.display==="none")return;const d=new Date();b.querySelector("#bigClock").textContent=d.toLocaleTimeString("vi-VN");b.querySelector("#bigDate").textContent=d.toLocaleDateString("vi-VN",{weekday:"long",year:"numeric",month:"long",day:"numeric"})}
+ tick();if(clockTimer)clearInterval(clockTimer);clockTimer=setInterval(tick,1000);
+ b.querySelector("#timerStart").onclick=()=>{if(activeTimer)clearInterval(activeTimer);stopAlarm();let sec=Math.max(1,Math.min(1440,+b.querySelector("#timerMin").value||1))*60;const status=b.querySelector("#timerStatus"),style=b.querySelector("#alarmStyle").value;status.textContent="Đang đếm ngược...";activeTimer=setInterval(()=>{sec--;if(sec<=0){clearInterval(activeTimer);activeTimer=null;status.textContent="⏰ Hết giờ rồi! Đang phát tiếng báo…";playAlarm(style);alert("⏰ Hết giờ rồi! Nhấn OK để tắt thông báo; tiếng báo có thể tiếp tục một chút.")}else status.textContent="Còn "+Math.floor(sec/60)+" phút "+sec%60+" giây"},1000)};
+ b.querySelector("#timerStop").onclick=()=>{if(activeTimer)clearInterval(activeTimer);activeTimer=null;stopAlarm();b.querySelector("#timerStatus").textContent="Đã dừng đồng hồ."};b.querySelector("#alarmTest").onclick=()=>{playAlarm(b.querySelector("#alarmStyle").value);b.querySelector("#timerStatus").textContent="Đang thử tiếng báo…"};
+}
+
+/* TRASH */
+function openTrash(){
+ const w=shell("trash","Trash · Recycle bin",`<div class="row"><div style="font-size:35px">🗑️</div><div><b>Thùng rác của bạn</b><div class="muted">Khôi phục hoặc xoá ảnh đã xoá.</div></div></div><hr><div class="row"><button id="tRestore">↩ Khôi phục tất cả</button><button id="tEmpty">🗑 Dọn sạch</button></div><p id="tCount" class="muted"></p><div id="trashList"></div>`,true);
+ const b=w.querySelector(".winbody"),list=b.querySelector("#trashList");
+ function render(){
+  b.querySelector("#tCount").textContent=trash.length+" mục trong thùng rác";list.innerHTML="";
+  if(!trash.length){list.innerHTML='<div class="panel" style="text-align:center;padding:35px">🌱 Thùng rác đang trống!</div>';return}
+  trash.forEach((it,i)=>{const row=document.createElement("div");row.className="trashItem";const em=document.createElement("span");em.textContent="🖼️";const name=document.createElement("span");name.className="name";name.textContent=it.name;const restore=document.createElement("button");restore.textContent="↩ Khôi phục";restore.onclick=()=>{gallery.push(it);trash.splice(i,1);render()};const del=document.createElement("button");del.textContent="Xoá hẳn";del.onclick=()=>{trash.splice(i,1);render()};row.append(em,name,restore,del);list.append(row)});
+ }
+ b.querySelector("#tRestore").onclick=()=>{gallery.push(...trash);trash=[];render()};
+ b.querySelector("#tEmpty").onclick=()=>{if(confirm("Xoá vĩnh viễn tất cả mục trong thùng rác?")){trash=[];render()}};
+ render();
+}
+
+/* CALENDAR — simple monthly calendar with notes per day */
+function openCalendar(){
+ const w=shell("calendar","Calendar · Pastel days",`<div class="row" style="justify-content:space-between;align-items:center"><button id="calPrev">‹ Tháng trước</button><h3 id="calTitle" style="margin:0;text-align:center;flex:1"></h3><button id="calNext">Tháng sau ›</button></div><div id="calGrid" style="display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:5px;margin-top:14px"></div><div class="panel" style="margin-top:14px"><b id="calSelected"></b><textarea id="calNote" placeholder="Ghi chú cho ngày này..." style="width:100%;min-height:85px;margin-top:8px"></textarea><div class="row" style="margin-top:8px"><button id="calSave">💾 Lưu ghi chú</button><span id="calStatus" class="muted"></span></div></div>`,true);
+ const b=w.querySelector(".winbody"),grid=b.querySelector("#calGrid"),now=new Date();let year=now.getFullYear(),month=now.getMonth(),selected=now.getDate();const key=(y,m,d)=>`pastelPC_calendar_${y}-${String(m+1).padStart(2,"0")}-${String(d).padStart(2,"0")}`;
+ function loadNote(){b.querySelector("#calSelected").textContent=new Date(year,month,selected).toLocaleDateString("vi-VN",{weekday:"long",day:"numeric",month:"long",year:"numeric"});try{b.querySelector("#calNote").value=localStorage.getItem(key(year,month,selected))||""}catch{b.querySelector("#calNote").value=""}b.querySelector("#calStatus").textContent=""}
+ function render(){grid.innerHTML="";b.querySelector("#calTitle").textContent=new Date(year,month,1).toLocaleDateString("vi-VN",{month:"long",year:"numeric"});["T2","T3","T4","T5","T6","T7","CN"].forEach(day=>{const h=document.createElement("div");h.textContent=day;h.style.cssText="text-align:center;font-weight:bold;padding:5px 0;font-size:12px";grid.append(h)});const first=(new Date(year,month,1).getDay()+6)%7,total=new Date(year,month+1,0).getDate();for(let i=0;i<first;i++)grid.append(document.createElement("div"));for(let d=1;d<=total;d++){const btn=document.createElement("button");btn.textContent=d;btn.style.cssText="padding:9px 0;min-width:0;border-radius:10px";if(d===selected)btn.style.outline="2px solid #b8a1dc";if(year===now.getFullYear()&&month===now.getMonth()&&d===now.getDate())btn.style.fontWeight="bold";try{if(localStorage.getItem(key(year,month,d)))btn.textContent=d+" ·"}catch{}btn.onclick=()=>{selected=d;render();loadNote()};grid.append(btn)}loadNote()}
+ b.querySelector("#calPrev").onclick=()=>{month--;if(month<0){month=11;year--}selected=Math.min(selected,new Date(year,month+1,0).getDate());render()};b.querySelector("#calNext").onclick=()=>{month++;if(month>11){month=0;year++}selected=Math.min(selected,new Date(year,month+1,0).getDate());render()};b.querySelector("#calSave").onclick=()=>{try{const val=b.querySelector("#calNote").value;if(val.trim())localStorage.setItem(key(year,month,selected),val);else localStorage.removeItem(key(year,month,selected));b.querySelector("#calStatus").textContent="Đã lưu ghi chú ♡";render()}catch{b.querySelector("#calStatus").textContent="Không thể lưu ghi chú"}};render();
+}
+
+/* SECRET */
+function openSecret(showPenguin=false){
+ const w=shell("secret","Secret · Top secret",`<div style="text-align:center;padding:8px"><div style="font-size:43px">🤫</div><h2 style="margin:5px">Secret corner</h2><p class="muted">Psst... có vài bí mật ở đây đó.</p></div>
+ <div class="panel" style="margin:10px 0"><button id="secretLine0" class="secret-line">🔐 Ấn vào đây</button></div>
+ <div class="panel" style="margin:10px 0"><button id="secretLine1" class="secret-line">👀 Ấn vào đây</button><p id="secretStatus" class="muted">Có điều bất ngờ đang chờ...</p></div>
+ <div class="panel" style="margin:10px 0"><button id="secretLine2" class="secret-line">🐧 Ấn vào đây</button><div id="secretPenguinArea"><button id="secretPenguin" aria-label="Bí mật chim cánh cụt">🐧</button><p>Ấn vào con chim cánh cụt đi</p></div></div>`,true);
+ const b=w.querySelector(".winbody");
+ b.querySelector("#secretLine0").onclick=()=>location.href=SECRET_LINK;
+ /* Nút ở giữa mở đúng YouTube Shorts bạn gửi */
+ b.querySelector("#secretLine1").onclick=()=>window.open(SECRET_MIDDLE_LINK,"_blank","noopener,noreferrer");
+ b.querySelector("#secretLine2").onclick=()=>b.querySelector("#secretPenguinArea").style.display="block";
+ b.querySelector("#secretPenguin").onclick=()=>location.href=SECRET_LINK;
+ if(showPenguin)b.querySelector("#secretPenguinArea").style.display="block";
+ if(secretMessageText)b.querySelector("#secretStatus").textContent=secretMessageText;
+}
+function secretAltZero(){
+ const now=Date.now();
+ if(now<overloadUntil){secretMessageText="Quá tải";const s=$("#win-secret #secretStatus");if(s)s.textContent=secretMessageText;return}
+ altZeroTimes=altZeroTimes.filter(t=>now-t<1800);altZeroTimes.push(now);
+ if(altZeroTimes.length>=4){overloadUntil=now+2500;altZeroTimes=[];clearTimeout(jumpTimer);secretMessageText="Quá tải";const s=$("#win-secret #secretStatus");if(s)s.textContent=secretMessageText;return}
+ const s=$("#win-secret #secretStatus");if(s)s.textContent="👀 2 giây nữa...";
+ clearTimeout(jumpTimer);jumpTimer=setTimeout(()=>{if(Date.now()<overloadUntil)return;$("#jumpscare").style.display="flex";secretMessageText="Đã có jumpscare 😈";const status=$("#win-secret #secretStatus");if(status)status.textContent=secretMessageText},2000);
+}
+function closeScare(){$("#jumpscare").style.display="none"}
+$("#scareClose").onclick=closeScare;
+$("#jumpscare").addEventListener("click",e=>{if(e.target.id==="jumpscare")closeScare()});
+
+/* SETTINGS */
+function openSettings(){
+ const w=shell("settings","Settings · Personalize your PC",`<div class="row" style="align-items:flex-start">
+ <div class="panel" style="flex:1;min-width:220px"><h3>🎨 Nền desktop</h3><label>Tên desktop<br><input id="sName" maxlength="35" style="width:100%"></label>
+ <p><label>Kiểu nền<br><select id="sMode" style="width:100%"><option value="gradient">Gradient pastel</option><option value="solid">Một màu</option><option value="image">Ảnh của tôi</option></select></label></p>
+ <div class="row"><label>Màu 1 <input type="color" id="sColor"></label><label>Màu 2 <input type="color" id="sColor2"></label></div>
+ <p class="row"><button id="sUpload">＋ Chọn ảnh nền</button><button id="sRemoveImage">Bỏ ảnh nền</button></p><p class="muted">Nhấn Lưu để áp dụng.</p><div class="row"><button id="sSave">💾 Lưu cài đặt</button><button id="sReset">Đặt lại nền</button></div></div>
+ <div class="panel" style="flex:1;min-width:220px"><h3>🧸 Avatar</h3><img id="sAvatarPreview" alt="Xem trước avatar" style="width:85px;height:85px;object-fit:cover;border-radius:24px;border:2px solid white"><p class="row"><button id="sAvatar">＋ Đổi avatar</button><button id="sAvatarRemove">Đặt lại avatar</button></p></div></div><p id="sStatus" class="muted"></p>`,true);
+ const b=w.querySelector(".winbody");
+ b.querySelector("#sName").value=(settings.pcname||defaults.pcname).replace(/♡/g,"").trim();b.querySelector("#sMode").value=settings.wallpaper;b.querySelector("#sColor").value=settings.wallColor;b.querySelector("#sColor2").value=settings.wallColor2;b.querySelector("#sAvatarPreview").src=settings.avatar||art("flowers");
+ function status(t){b.querySelector("#sStatus").textContent=t}
+ b.querySelector("#sUpload").onclick=()=>$("#wallUpload").click();
+ $("#wallUpload").onchange=e=>{dataImage(e.target.files[0],src=>{settings.wallpaperImage=src;settings.wallpaper="image";b.querySelector("#sMode").value="image";status("Đã chọn ảnh nền. Bấm Lưu cài đặt để áp dụng.")});e.target.value=""};
+ b.querySelector("#sAvatar").onclick=()=>$("#avatarUpload").click();
+ $("#avatarUpload").onchange=e=>{dataImage(e.target.files[0],src=>{settings.avatar=src;b.querySelector("#sAvatarPreview").src=src;status("Đã chọn avatar. Bấm Lưu cài đặt để áp dụng.")});e.target.value=""};
+ b.querySelector("#sAvatarRemove").onclick=()=>{settings.avatar="";b.querySelector("#sAvatarPreview").src=art("flowers");status("Avatar sẽ được đặt lại khi lưu.")};
+ b.querySelector("#sRemoveImage").onclick=()=>{settings.wallpaperImage="";settings.wallpaper="gradient";b.querySelector("#sMode").value="gradient";status("Đã bỏ ảnh nền tùy chỉnh.")};
+ b.querySelector("#sSave").onclick=()=>{settings.pcname=b.querySelector("#sName").value.replace(/♡/g,"").trim()||defaults.pcname;settings.wallpaper=b.querySelector("#sMode").value;settings.wallColor=b.querySelector("#sColor").value;settings.wallColor2=b.querySelector("#sColor2").value;saveSettings();applySettings();status("Đã lưu cài đặt desktop.")};
+ b.querySelector("#sReset").onclick=()=>{settings.wallpaper="gradient";settings.wallColor="#e8e0fa";settings.wallColor2="#f8e4ed";settings.wallpaperImage="";b.querySelector("#sMode").value="gradient";b.querySelector("#sColor").value=settings.wallColor;b.querySelector("#sColor2").value=settings.wallColor2;saveSettings();applySettings();status("Đã đặt lại nền pastel.")};
+}
+
+/* CHATGPT */
+function openChat(){
+ const w=shell("chat","ChatGPT · Chat window",`<div id="chatLayout"><aside id="chatSide"><div style="font-size:28px">💬</div><b>ChatGPT</b><p class="muted">Cửa sổ trò chuyện</p><button id="chatNew">＋ Cuộc trò chuyện mới</button><hr><button id="chatOpen">Mở ChatGPT ↗</button></aside>
+ <div id="chatMain"><div id="chatMessages"><div class="bubble">Xin chào! 🌿 Đây là cửa sổ ChatGPT trong desktop.</div><div class="bubble">Nhấn “Mở ChatGPT” để trò chuyện với AI thật.</div></div>
+ <form id="chatForm"><input id="chatInput" placeholder="Nhập tin nhắn..." autocomplete="off"><button>Gửi</button></form><div class="muted">Khung mô phỏng · tin nhắn chưa được gửi tới AI thật</div></div></div>`,true);
+ const b=w.querySelector(".winbody"),msgs=b.querySelector("#chatMessages");
+ b.querySelector("#chatOpen").onclick=()=>window.open("https://chatgpt.com/","_blank");
+ b.querySelector("#chatNew").onclick=()=>msgs.innerHTML='<div class="bubble">Cuộc trò chuyện mới</div>';
+ b.querySelector("#chatForm").onsubmit=e=>{e.preventDefault();const inp=b.querySelector("#chatInput"),val=inp.value.trim();if(!val)return;const me=document.createElement("div");me.className="bubble me";me.textContent=val;msgs.append(me);const reply=document.createElement("div");reply.className="bubble";reply.textContent="Đây là cửa sổ mô phỏng nên chưa có AI trả lời tự động. Nhấn “Mở ChatGPT” để trò chuyện thật nha!";msgs.append(reply);inp.value="";msgs.scrollTop=msgs.scrollHeight};
+}
+function tickTray(){$("#systemTray").textContent=new Date().toLocaleTimeString("vi-VN",{hour:"2-digit",minute:"2-digit"})}
+tickTray();setInterval(tickTray,15000);applySettings();
+</script>
+</body>
+</html>
